@@ -1,4 +1,5 @@
 const path = require("path");
+const { v4 } = require('uuid')
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
@@ -48,6 +49,47 @@ app.get("/api/wx_openid", async (req, res) => {
     res.send(req.headers["x-wx-openid"]);
   }
 });
+
+// 公众号调用，获取ticket
+app.get("/api/ticket", async (req, res) => {
+  // 这个请求可能会带有一个sceneStr, 解构赋值
+  const { sceneStr } = req.body
+  const sceneObj = {
+    event: 'oauth',
+    id: `${v4()}`
+  }
+  const scene_str = sceneStr ? sceneStr : JSON.stringify(sceneObj)
+  // # action_name:
+  // # # QR_SCENE 临时二维码
+  // # # QR_STR_SCENE 临时字符串参数值 √
+  // # # QR_LIMIT_SCENE 永久整型参数值
+  // # # QR_LIMIT_STR_SCENE 永久字符串参数值
+  // # scene_id: 场景值ID
+  // # scene_str: 字符串形式的场景值ID
+  const params = {
+    url: `https://api.weixin.qq.com/cgi-bin/qrcode/create`,
+    method: 'POST',
+    data: {
+      "expire_seconds": 3600,
+      "action_name": "QR_STR_SCENE", 
+      "action_info": {
+        "scene": {
+          "scene_str": scene_str
+        }
+      }
+    },
+  }
+  const respData = await axios(params).then(resp => {
+    return resp.data
+  })
+  if (respData.errcode || respData.errmsg) throw new Error(respData.errmsg)
+  res.send({
+    ticket: respData.ticket,
+    sceneId: scene_str,
+    expireSeconds: expire_seconds,
+    createdAt,
+  });
+})
 
 const port = process.env.PORT || 80;
 
