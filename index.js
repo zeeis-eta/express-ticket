@@ -57,15 +57,38 @@ app.get("/", async (req, res) => {
 //   }
 // });
 
-app.get("/ticket", function (req, res) {
+app.get("/msg", function (req, res) {
   request({
     method: 'POST',
     url: 'http://api.weixin.qq.com/wxa/msg_sec_check',
     body: JSON.stringify({
-      openid: 'ogEXr6dy7oAWIh7Le8lJep6cAmzw',
-      version: 2,
-      scene: 2,
+      openid: 'ogEXr6dy7oAWIh7Le8lJep6cAmzw', //用户的Openid，用户需要在近两个小时内访问过小程序
+      version: 2, // 2.0版本
+      scene: 2, //场景枚举值 1-资料 2-评论 3-论坛 4-社交日志
       content: '安全检测文本'
+    })
+  }, function (error, response) {
+    if (error) {
+      res.send(error.toString())
+    } else {
+      console.log('接口返回内容', response.body)
+      res.send(JSON.parse(response.body))
+    }
+  })
+})
+
+app.get("/ticket", function (req, res) {
+  request({
+    method: 'POST',
+    url: 'http://api.weixin.qq.com/cgi-bin/qrcode/create',
+    body: JSON.stringify({
+      action_name: 'QR_STR_SCENE',
+      expire_seconds: 3600,
+      action_info: {
+        scene: {
+          scene_str: '123'
+        }
+      }
     })
   }, function (error, response) {
     if (error) {
