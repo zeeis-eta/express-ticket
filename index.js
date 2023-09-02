@@ -51,7 +51,7 @@ app.get("/api/wx_openid", async (req, res) => {
 });
 
 // 公众号调用，获取ticket
-app.get("/api/ticket", async (req, res) => {
+app.post("/api/ticket", async (req, res) => {
   // 这个请求可能会带有一个sceneStr, 解构赋值
   const { sceneStr } = req.body
   const sceneObj = {
@@ -71,7 +71,7 @@ app.get("/api/ticket", async (req, res) => {
     method: 'POST',
     data: {
       "expire_seconds": 3600,
-      "action_name": "QR_STR_SCENE", 
+      "action_name": "QR_STR_SCENE",
       "action_info": {
         "scene": {
           "scene_str": scene_str
