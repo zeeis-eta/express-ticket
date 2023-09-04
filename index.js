@@ -77,16 +77,17 @@ app.get("/msg", function (req, res) {
   })
 })
 
-app.get("/ticket", function (req, res) {
+app.post("/ticket", function (req, res) {
+  const { sceneStr, expireSeconds } = req.body
   request({
     method: 'POST',
     url: 'http://api.weixin.qq.com/cgi-bin/qrcode/create',
     body: JSON.stringify({
       action_name: 'QR_STR_SCENE',
-      expire_seconds: 3600,
+      expire_seconds: expireSeconds || 3600,
       action_info: {
         scene: {
-          scene_str: '123'
+          scene_str: sceneStr
         }
       }
     })
