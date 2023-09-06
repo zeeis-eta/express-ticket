@@ -77,7 +77,7 @@ app.get("/msg", function (req, res) {
   })
 })
 
-app.post("/ticket", function (req, res) {
+app.post("/taoyi_ticket", function (req, res) {
   const { sceneStr, expireSeconds } = req.body
   request({
     method: 'POST',
@@ -100,6 +100,31 @@ app.post("/ticket", function (req, res) {
     }
   })
 })
+
+app.post("/guanhai_ticket", function (req, res) {
+  const { sceneStr, expireSeconds } = req.body
+  request({
+    method: 'POST',
+    url: 'http://api.weixin.qq.com/cgi-bin/qrcode/create?from_appid=wx1c096fbf07724f12',
+    body: JSON.stringify({
+      action_name: 'QR_STR_SCENE',
+      expire_seconds: expireSeconds || 3600,
+      action_info: {
+        scene: {
+          scene_str: sceneStr
+        }
+      }
+    })
+  }, function (error, response) {
+    if (error) {
+      res.send(error.toString())
+    } else {
+      console.log('接口返回内容', response.body)
+      res.send(JSON.parse(response.body))
+    }
+  })
+})
+
 
 // app.post("/ticket", async (req, res) => {
 //   // 这个请求可能会带有一个sceneStr, 解构赋值
